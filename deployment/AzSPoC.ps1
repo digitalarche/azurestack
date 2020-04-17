@@ -1983,6 +1983,8 @@ try {
                 #Install-Module -Name AzureRM.Storage -RequiredVersion 5.0.4 -Force -AllowClobber -Verbose
                 # Remove incompatible storage module installed by AzureRM.Storage
                 #Uninstall-Module Azure.Storage -RequiredVersion 4.6.1 -Force -Verbose
+                #Install the kbupdate module
+                Install-Module -Name kbupdate -Force -ErrorAction Stop
             }
             elseif ($deploymentMode -ne "Online") {
                 $SourceLocation = "$downloadPath\AzSFiles\PowerShell"
@@ -3308,8 +3310,8 @@ C:\AzSPoC\AzSPoC.ps1, you should find the Scripts folder located at C:\AzSPoC\Sc
                         Write-CustomVerbose -Message "Installing WinSCP with Chocolatey"
                         choco install winscp.install
                         #Edge Insider Beta
-                        Write-CustomVerbose -Message "Installing Edge Insider Preview"
-                        choco install microsoft-edge-insider
+                        Write-CustomVerbose -Message "Installing Microsoft Edge"
+                        choco install microsoft-edge
                         # Chrome
                         #Write-CustomVerbose -Message "Installing Chrome with Chocolatey"
                         #choco install googlechrome
