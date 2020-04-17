@@ -272,6 +272,7 @@ elseif (($skipRP -eq $false) -and ($progressCheck -ne "Complete")) {
 
                 ############################################################################################################################################################################
                 # Temporary Workaround to installing DB RP with PS 1.8.0 and newer AzureRM 2.5.0
+                Write-Host "Editing the Common Module file to ensure process completes..."
                 $getCommonModule = (Get-ChildItem -Path "$azsPath\databases\$dbrpPath\Prerequisites\Common" -Recurse -Include "Common.psm1" -ErrorAction Stop).FullName
                 $old1 = '$AzPshInstallFolder = "SqlMySqlPsh"'
                 $new1 = '$AzPshInstallFolder = "WindowsPowerShell\Modules"'
@@ -318,6 +319,37 @@ elseif (($skipRP -eq $false) -and ($progressCheck -ne "Complete")) {
                         Write-Host "Known issues with Azure PowerShell and DB RPs - editing Common.psm1"
                         Write-Host "Editing AzureRM.Profile Version"
                         (Get-Content $getCommonModule) | ForEach-Object { $_ -replace $pattern7, $new4 } -Verbose -ErrorAction Stop | Set-Content $getCommonModule -Verbose -ErrorAction Stop
+                        Write-Host "Editing completed."
+                    }
+                }
+                # End of Temporary Workaround
+                ############################################################################################################################################################################
+
+                ############################################################################################################################################################################
+                # Temporary Workaround to installing DB RP on ASDK 2002 with longer RP Timeout
+                Write-Host "Editing the Deploy_X_Provider.ps1 file to ensure process completes..."
+                $getProviderFile = (Get-ChildItem -Path "$azsPath\databases\$dbrpPath\" -Recurse -Include "Deploy*SQLProvider.ps1" -ErrorAction Stop).FullName
+                $old1 = 'MaxRetryCount 10'
+                $new1 = 'MaxRetryCount 24'
+                $old2 = 'RetryDuration 60'
+                $new2 = 'RetryDuration 300'
+                $pattern1 = [RegEx]::Escape($old1)
+                $pattern2 = [RegEx]::Escape($new1)
+                $pattern3 = [RegEx]::Escape($old2)
+                $pattern4 = [RegEx]::Escape($new2)
+                if (!((Get-Content $getProviderFile) | Select-String $pattern2)) {
+                    if ((Get-Content $getProviderFile) | Select-String $pattern1) {
+                        Write-Host "Known issues with Azure PowerShell and DB RPs - editing Provider file"
+                        Write-Host "Editing MaxRetryCount"
+                        (Get-Content $getProviderFile) | ForEach-Object { $_ -replace $pattern1, $new1 } -Verbose -ErrorAction Stop | Set-Content $getProviderFile -Verbose -ErrorAction Stop
+                        Write-Host "Editing completed."
+                    }
+                }
+                if (!((Get-Content $getProviderFile) | Select-String $pattern4)) {
+                    if ((Get-Content $getProviderFile) | Select-String $pattern3) {
+                        Write-Host "Known issues with Azure PowerShell and DB RPs - editing Provider file"
+                        Write-Host "Editing RetryDuration"
+                        (Get-Content $getProviderFile) | ForEach-Object { $_ -replace $pattern3, $new2 } -Verbose -ErrorAction Stop | Set-Content $getProviderFile -Verbose -ErrorAction Stop
                         Write-Host "Editing completed."
                     }
                 }
